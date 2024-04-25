@@ -1,4 +1,4 @@
-A  ```simple``` React Native App that lets users set their goals, by creating and deleting them after achieving them!
+A  ```simple``` React Native App that lets users set their goals!
 
 # Getting Started
 
