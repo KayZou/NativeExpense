@@ -1,6 +1,6 @@
 import {Pressable, StyleSheet, Text, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {GlobalStyles} from '../constants/styles';
+import {GlobalStyles} from '../../constants/styles';
 
 function ExpenseItem({expense}) {
   const navigate = useNavigation();

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 A `simple` React Native App that lets users set & manage their goals!
+=======
+A  ```simple``` React Native App that lets users set their goals!
+>>>>>>> 69a2c99ec72288945ea8083a56ce0c4a4892dcdf
 
 # Getting Started
 
