@@ -1,6 +1,6 @@
 A ```simple``` React Native App that lets users register their expenses, a ```personal finance``` mobile app!
 
-The data now is stored only within the program memory, the backend are in the upcoming tasks.
+The data now is stored in a Firebase database!
 
 ![image](https://github.com/KayZou/NativeExpense/assets/82322986/d756e188-3c56-4fb2-8da5-47a0034ee6b2)
 
