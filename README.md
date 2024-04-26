@@ -1,4 +1,4 @@
-A ```simple``` React Native App that lets users set their goals!
+A ```simple``` React Native App that lets users register their expenses, a ```personal finance``` mobile app!
 
 The data now is stored only within the program memory, the backend are in the upcoming tasks.
 
