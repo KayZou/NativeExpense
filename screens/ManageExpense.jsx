@@ -1,11 +1,17 @@
-import {useContext, useLayoutEffect} from 'react';
+import {useContext, useLayoutEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
-import {Text} from 'react-native';
 import IconButton from '../UI/IconButton';
+import Loader from '../UI/Loader';
 import {GlobalStyles} from '../constants/styles';
 import Button from '../UI/Button';
+import Error from '../UI/Error';
 import {ExpensesContext} from '../store/expensesContext';
 import ExpenseForm from '../components/Expenses/ExpenseForm';
+import {
+  storeExpense,
+  deleteExpense as deleteExpenseReq,
+  updateExpense as updateExpenseReq,
+} from '../utils/http';
 
 export default function ManageExpense({route, navigation}) {
   const expenseCtx = useContext(ExpensesContext);
@@ -13,9 +19,12 @@ export default function ManageExpense({route, navigation}) {
   const expenseId = route.params?.expenseId;
   const isEditing = !!expenseId;
 
-const selectedExpense = expenseCtx.expenses.find((expense) => {
-  return expense.id === expenseId;
-})
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const selectedExpense = expenseCtx.expenses.find(expense => {
+    return expense.id === expenseId;
+  });
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -23,25 +32,55 @@ const selectedExpense = expenseCtx.expenses.find((expense) => {
     });
   }, [navigation, isEditing]);
 
-  function deleteExpense() {
-    navigation.goBack();
-    expenseCtx.deleteExpense(expenseId);
+  const handleAsyncAction = async action => {
+    setLoading(true);
+    try {
+      await action();
+    } catch (error) {
+      setError(error.message || error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  async function deleteExpense() {
+    await handleAsyncAction(async () => {
+      await deleteExpenseReq(expenseId);
+      expenseCtx.deleteExpense(expenseId);
+      navigation.goBack();
+    });
   }
 
   function cancelHandler() {
     navigation.goBack();
   }
 
-  function confirmHandler(expense) {
-    if (isEditing) {
-      expenseCtx.updateExpense(expenseId, expense);
-    } else {
-      expenseCtx.addExpense(expense);
-    }
-    navigation.goBack();
+  async function confirmHandler(expense) {
+    await handleAsyncAction(async () => {
+      if (isEditing) {
+        expense.id = expenseId;
+        await updateExpenseReq(expenseId, expense);
+        expenseCtx.updateExpense(expenseId, expense);
+      } else {
+        const id = await storeExpense(expense);
+        expenseCtx.addExpense({...expense, id});
+      }
+      navigation.goBack();
+    });
   }
 
-  return (
+  if (error) {
+    return (
+      <Error
+        message={error}
+        onConfirm={() => (cancelHandler(), setError(''))}
+      />
+    );
+  }
+
+  return loading ? (
+    <Loader />
+  ) : (
     <View style={styles.container}>
       <ExpenseForm
         onCancel={cancelHandler}
@@ -49,14 +88,6 @@ const selectedExpense = expenseCtx.expenses.find((expense) => {
         onSubmit={confirmHandler}
         defaultValues={selectedExpense}
       />
-      {/* <View style={styles.buttonsContainer}>
-        <Button mode="flat" onPress={cancelHandler} style={styles.button}>
-          Cancel
-        </Button>
-        <Button style={styles.button} onPress={confirmHandler}>
-          {isEditing ? 'Update' : 'Add'}
-        </Button>
-      </View> */}
       {isEditing && (
         <View style={styles.deleteContainer}>
           <IconButton

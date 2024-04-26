@@ -1,89 +1,9 @@
 import {createContext, useReducer} from 'react';
 
-const expensesData = [
-  {
-    id: 'e1',
-    description: 'A pair of shoes',
-    amount: 59.99,
-    date: new Date('2022-12-12'),
-  },
-  {
-    id: 'e2',
-    description: 'A pair of trousers',
-    amount: 89.29,
-    date: new Date('2022-12-13'),
-  },
-  {
-    id: 'e3',
-    description: 'Some bananas',
-    amount: 5.99,
-    date: new Date('2022-12-14'),
-  },
-  {
-    id: 'e4',
-    description: 'A book',
-    amount: 14.99,
-    date: new Date('2022-12-15'),
-  },
-  {
-    id: 'e5',
-    description: 'Another book',
-    amount: 18.99,
-    date: new Date('2022-12-16'),
-  },
-  {
-    id: 'e6',
-    description: 'A pair of shoes',
-    amount: 59.99,
-    date: new Date('2022-12-17'),
-  },
-  {
-    id: 'e7',
-    description: 'A pair of trousers',
-    amount: 89.29,
-    date: new Date('2022-12-18'),
-  },
-  {
-    id: 'e8',
-    description: 'Some bananas',
-    amount: 5.99,
-    date: new Date('2022-12-19'),
-  },
-  {
-    id: 'e9',
-    description: 'A book',
-    amount: 14.99,
-    date: new Date('2022-12-20'),
-  },
-  {
-    id: 'e10',
-    description: 'Another book',
-    amount: 18.99,
-    date: new Date('2022-12-21'),
-  },
-  {
-    id: 'e11',
-    description: 'A pair of shoes',
-    amount: 59.99,
-    date: new Date('2022-12-22'),
-  },
-  {
-    id: 'e12',
-    description: 'A pair of trousers',
-    amount: 89.29,
-    date: new Date('2022-12-23'),
-  },
-  {
-    id: 'e13',
-    description: 'Some bananas',
-    amount: 5.99,
-    date: new Date('2022-12-24'),
-  },
-];
-
 export const ExpensesContext = createContext({
   expenses: [],
   addExpense: expense => {},
+  setExpenses: expenses => {},
   deleteExpense: expenseId => {},
   updateExpense: (expenseId, expense) => {},
 });
@@ -91,8 +11,10 @@ export const ExpensesContext = createContext({
 function expensesReducer(state, action) {
   switch (action.type) {
     case 'ADD':
-      const id = new Date().toISOString() + Math.random().toString();
-      return [{...action.payload, id: id}, ...state];
+      return [action.payload, ...state];
+    case 'SET':
+      const inverted = action.payload.reverse();
+      return inverted;
     case 'UPDATE':
       return state.map(expense => {
         if (expense.id === action.payload.id) {
@@ -109,10 +31,14 @@ function expensesReducer(state, action) {
 }
 
 export default function ExpensesContextProvider({children}) {
-  const [expensesState, dispatch] = useReducer(expensesReducer, expensesData);
+  const [expensesState, dispatch] = useReducer(expensesReducer, []);
 
   function addExpense(expense) {
     dispatch({type: 'ADD', payload: expense});
+  }
+
+  function setExpenses(expenses) {
+    dispatch({type: 'SET', payload: expenses});
   }
 
   function deleteExpense(expenseId) {
@@ -126,6 +52,7 @@ export default function ExpensesContextProvider({children}) {
   const value = {
     expenses: expensesState,
     addExpense,
+    setExpenses,
     deleteExpense,
     updateExpense,
   };
